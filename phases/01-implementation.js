@@ -10,7 +10,9 @@ class HashTable { // get O(1), set O(1), deleteKey O(1)
 
   constructor(numBuckets = 8) {
     // Initialize your buckets here
-    // Your code here
+    this.capacity = numBuckets;
+    this.count = 0;
+    this.data = new Array(numBuckets).fill(null);
   }
 
   hash(key) {
@@ -30,12 +32,49 @@ class HashTable { // get O(1), set O(1), deleteKey O(1)
 
 
   insert(key, value) {
-    // Your code here
+    let index = this.hashMod(key);
+    let newPair = new KeyValuePair(key, value);
+
+    if (this.data[index]) {
+      let curr = this.data[index];
+
+      while (curr) {
+        if (curr.key === key) {
+          curr.value = value;
+          return;
+        }
+        curr = curr.next;
+      }
+
+      newPair.next = this.data[index];
+    }
+
+    this.data[index] = newPair;
+    this.count++;
   }
 
 
   read(key) {
-    // Your code here
+    let index = this.hashMod(key);
+
+    if (this.data[index] === null) {
+      return undefined;
+
+    } else if (this.data[index].next === null) {
+      return this.data[index].value;
+
+    } else {
+      let curr = this.data[index];
+
+      while (curr) {
+        if (curr.key === key) {
+          return curr.value;
+        }
+        curr = curr.next;
+      }
+
+      return undefined;
+    }
   }
 
 
