@@ -32,6 +32,10 @@ class HashTable { // get O(1), set O(1), deleteKey O(1)
 
 
   insert(key, value) {
+    if ((this.count / this.capacity) >= 0.7) {
+      this.resize();
+    }
+
     let index = this.hashMod(key);
     let newPair = new KeyValuePair(key, value);
 
@@ -60,7 +64,7 @@ class HashTable { // get O(1), set O(1), deleteKey O(1)
     if (this.data[index] === null) {
       return undefined;
 
-    } else if (this.data[index].next === null) {
+    } else if (this.data[index].key === key) {
       return this.data[index].value;
 
     } else {
@@ -79,12 +83,41 @@ class HashTable { // get O(1), set O(1), deleteKey O(1)
 
 
   resize() {
-    // Your code here
+    this.capacity *= 2;
+    this.count = 0;
+    let oldData = this.data;
+    this.data = new Array(this.capacity).fill(null);
+
+    for (let i = 0; i < oldData.length; i++) {
+      let pair = oldData[i];
+      while (pair) {
+        this.insert(pair.key, pair.value);
+        pair = pair.next;
+      }
+    }
   }
 
-
+  // I know it's sort of violating DRY but I think adding the "Key not found" message inside the first if statement
+  // makes the code a bit more readable.
   delete(key) {
-    // Your code here
+    let index = this.hashMod(key);
+    if (!this.data[index]) {
+      return 'Key not found';
+    } else if (this.data[index].key === key) {
+      this.data[index] = this.data[index].next;
+      this.count--;
+    } else {
+      let curr = this.data[index];
+      while (curr.next) {
+        if (curr.next.key === key) {
+          curr.next = curr.next.next;
+          this.count--;
+          return;
+        }
+      }
+    }
+
+    return 'Key not found';
   }
 }
 
